@@ -15,29 +15,36 @@ func NewGalleryHandler(gs models.GalleryService) *GalleryHandler {
 	return &GalleryHandler{gs}
 }
 
-type CreateGallery struct {
-	Name string
+type CreateReq struct {
+	Name string `json:"name"`
+}
+
+type CreateRes struct {
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	IsPublish bool   `json:"is_publish"`
 }
 
 func (gh *GalleryHandler) Create(c *gin.Context) {
-	data := new(CreateGallery)
-	if err := c.BindJSON(data); err != nil {
+	req := new(CreateReq)
+	if err := c.BindJSON(req); err != nil {
 		Error(c, 400, err)
 		return
 	}
 	gallery := new(models.Gallery)
-	gallery.Name = data.Name
+	gallery.Name = req.Name
 	if err := gh.gs.Create(gallery); err != nil {
 		Error(c, 500, err)
 		return
 	}
-	c.JSON(201, gin.H{
-		"id":   gallery.ID,
-		"name": gallery.Name,
+	c.JSON(201, CreateRes{
+		ID:        gallery.ID,
+		Name:      gallery.Name,
+		IsPublish: gallery.IsPublish,
 	})
 }
 
-type Gallery struct {
+type GalleryRes struct {
 	ID        uint   `json:"id"`
 	Name      string `json:"name"`
 	IsPublish bool   `json:"is_publish"`
@@ -49,9 +56,9 @@ func (gh *GalleryHandler) List(c *gin.Context) {
 		Error(c, 500, err)
 		return
 	}
-	galleries := []Gallery{}
+	galleries := []GalleryRes{}
 	for _, d := range data {
-		galleries = append(galleries, Gallery{
+		galleries = append(galleries, GalleryRes{
 			ID:        d.ID,
 			Name:      d.Name,
 			IsPublish: d.IsPublish,
@@ -76,7 +83,7 @@ func (gh *GalleryHandler) Delete(c *gin.Context) {
 }
 
 type UpdateNameReq struct {
-	Name string
+	Name string `json:"name"`
 }
 
 func (gh *GalleryHandler) UpdateName(c *gin.Context) {
@@ -100,7 +107,7 @@ func (gh *GalleryHandler) UpdateName(c *gin.Context) {
 }
 
 type UpdateStatusReq struct {
-	IsPublish bool
+	IsPublish bool `json:"is_publish"`
 }
 
 func (gh *GalleryHandler) UpdatePublishing(c *gin.Context) {

@@ -16,17 +16,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = db.AutoMigrate(
-		&models.Gallery{},
-	).Error
+	err = models.AutoMigrate(db)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	gs := models.NewGalleryService(db)
+	ims := models.NewImageService(db)
+
 	gh := handlers.NewGalleryHandler(gs)
+	imh := handlers.NewImageHandler(gs, ims)
 
 	r := gin.Default()
+	r.Static("/upload", "./upload")
 
 	r.POST("/galleries", gh.Create)
 	r.GET("/galleries", gh.List)
@@ -34,6 +36,12 @@ func main() {
 	r.DELETE("/galleries/:id", gh.Delete)
 	r.PATCH("/galleries/:id/names", gh.UpdateName)
 	r.PATCH("/galleries/:id/publishes", gh.UpdatePublishing)
+
+	r.POST("/galleries/:id/images", imh.CreateImage)
+	r.GET("/galleries/:id/images", imh.ListGalleryImages)
+	// r.DELETE("/images/:id", handlers.DeleteImage(imageService))
+	// r.GET("/galleries/:id/images", handlers.ListGalleryImage(galleryService, imageService))
+
 	r.Run()
 
 }

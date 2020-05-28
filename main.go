@@ -39,8 +39,7 @@ func main() {
 
 	r.POST("/galleries/:id/images", imh.CreateImage)
 	r.GET("/galleries/:id/images", imh.ListGalleryImages)
-	// r.DELETE("/images/:id", handlers.DeleteImage(imageService))
-	// r.GET("/galleries/:id/images", handlers.ListGalleryImage(galleryService, imageService))
+	r.DELETE("/images/:id", imh.DeleteImage)
 
 	r.Run()
 

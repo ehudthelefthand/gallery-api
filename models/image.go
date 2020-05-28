@@ -2,6 +2,7 @@ package models
 
 import (
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -19,9 +20,14 @@ type Image struct {
 	Filename  string `gorm:"not null"`
 }
 
+func (img *Image) FilePath() string {
+	idStr := strconv.FormatUint(uint64(img.GalleryID), 10)
+	return filepath.Join(UploadPath, idStr, img.Filename)
+}
+
 type ImageService interface {
 	CreateImages(images []*multipart.FileHeader, galleryID uint) ([]Image, error)
-	// Delete(id uint) error
+	Delete(id uint) error
 	GetByGalleryID(id uint) ([]Image, error)
 }
 
@@ -54,11 +60,6 @@ func (ims *imageService) CreateImages(files []*multipart.FileHeader, galleryID u
 
 	images := []Image{}
 	for _, file := range files {
-		dst := filepath.Join(dir, file.Filename)
-		if err := saveFile(file, dst); err != nil {
-			tx.Rollback()
-			return nil, err
-		}
 		image := Image{
 			GalleryID: galleryID,
 			Filename:  file.Filename,
@@ -68,6 +69,11 @@ func (ims *imageService) CreateImages(files []*multipart.FileHeader, galleryID u
 			return nil, err
 		}
 		images = append(images, image)
+
+		if err := saveFile(file, image.FilePath()); err != nil {
+			tx.Rollback()
+			return nil, err
+		}
 	}
 
 	if err := tx.Commit().Error; err != nil {
@@ -94,20 +100,27 @@ func saveFile(file *multipart.FileHeader, dst string) error {
 	return err
 }
 
-// // Delete will delete image from db
-// func (ims *ImageService) Delete(image *Image) error {
-// 	return ims.DB.Where("id = ?", image.ID).Delete(image).Error
-// }
+func (ims *imageService) Delete(id uint) error {
+	image, err := ims.GetByID(id)
+	if err != nil {
+		return err
+	}
+	err = os.Remove(image.FilePath())
+	if err != nil {
+		log.Printf("Fail deleting image: %v\n", err)
+	}
+	return ims.db.Where("id = ?", id).Delete(&Image{}).Error
+}
 
-// // GetByID will return image of a given ID
-// func (ims *ImageService) GetByID(id uint) (*Image, error) {
-// 	image := new(Image)
-// 	err := ims.DB.First(image, "id = ?", id).Error
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return image, nil
-// }
+// GetByID will return image of a given ID
+func (ims *imageService) GetByID(id uint) (*Image, error) {
+	image := new(Image)
+	err := ims.db.First(image, "id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+	return image, nil
+}
 
 func (ims *imageService) GetByGalleryID(id uint) ([]Image, error) {
 	images := []Image{}

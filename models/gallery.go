@@ -1,6 +1,11 @@
 package models
 
 import (
+	"log"
+	"os"
+	"path/filepath"
+	"strconv"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -50,7 +55,35 @@ func (gg *galleryGorm) GetByID(id uint) (*Gallery, error) {
 }
 
 func (gg *galleryGorm) DeleteGallery(id uint) error {
-	return gg.db.Where("id = ?", id).Delete(&Gallery{}).Error
+	tx := gg.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	err := gg.db.Where("gallery_id = ?", id).Delete(&Image{}).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = gg.db.Where("id = ?", id).Delete(&Gallery{}).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	idStr := strconv.FormatUint(uint64(id), 10)
+	if err := os.RemoveAll(filepath.Join(UploadPath, idStr)); err != nil {
+		log.Printf("Fail deleting image files: %v\n", err)
+	}
+
+	return tx.Commit().Error
 }
 
 func (gg *galleryGorm) UpdateGalleryName(id uint, name string) error {

@@ -66,29 +66,19 @@ func (imh *ImageHandler) CreateImage(c *gin.Context) {
 	c.JSON(201, res)
 }
 
-// func (imh *ImageHandler) DeleteImage(c *gin.Context) {
-// 	idStr := c.Param("id")
-// 	id, err := strconv.ParseUint(idStr, 10, 32)
-// 	if err != nil {
-// 		Error(c, http.StatusBadRequest, err)
-// 		return
-// 	}
-// 	image, err := imh.ims.GetByID(uint(id))
-// 	if err != nil {
-// 		Error(c, http.StatusNotFound, err)
-// 		return
-// 	}
-// 	if err := imh.ims.Delete(image); err != nil {
-// 		Error(c, http.StatusInternalServerError, err)
-// 		return
-// 	}
-// 	fullpath := filepath.Join(uploadPath, image.Filename)
-// 	if err := os.Remove(fullpath); err != nil {
-// 		Error(c, http.StatusInternalServerError, err)
-// 		return
-// 	}
-// 	c.Status(http.StatusOK)
-// }
+func (imh *ImageHandler) DeleteImage(c *gin.Context) {
+	imageIDStr := c.Param("id")
+	id, err := strconv.Atoi(imageIDStr)
+	if err != nil {
+		Error(c, 400, err)
+		return
+	}
+	if err := imh.ims.Delete(uint(id)); err != nil {
+		Error(c, 500, err)
+		return
+	}
+	c.Status(http.StatusOK)
+}
 
 type ListGalleryImagesRes struct {
 	ImageRes

@@ -31,7 +31,8 @@ func main() {
 	r.POST("/galleries", gh.Create)
 	r.GET("/galleries", gh.List)
 	r.DELETE("/galleries/:id", gh.Delete)
-
+	r.PATCH("/galleries/:id/names", gh.UpdateName)
+	r.PATCH("/galleries/:id/status", gh.UpdateStatus)
 	r.Run()
 
 	// gs := models.NewGalleryService(db)

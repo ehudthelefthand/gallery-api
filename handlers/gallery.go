@@ -72,3 +72,51 @@ func (gh *GalleryHandler) Delete(c *gin.Context) {
 	}
 	c.Status(204)
 }
+
+type UpdateNameReq struct {
+	Name string
+}
+
+func (gh *GalleryHandler) UpdateName(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		Error(c, 400, err)
+		return
+	}
+	req := new(UpdateNameReq)
+	if err := c.BindJSON(req); err != nil {
+		Error(c, 400, err)
+		return
+	}
+	err = gh.gs.UpdateGalleryName(uint(id), req.Name)
+	if err != nil {
+		Error(c, 500, err)
+		return
+	}
+	c.Status(204)
+}
+
+type UpdateStatusReq struct {
+	IsPublish bool
+}
+
+func (gh *GalleryHandler) UpdateStatus(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		Error(c, 400, err)
+		return
+	}
+	req := new(UpdateStatusReq)
+	if err := c.BindJSON(req); err != nil {
+		Error(c, 400, err)
+		return
+	}
+	err = gh.gs.UpdateGalleryStatus(uint(id), req.IsPublish)
+	if err != nil {
+		Error(c, 500, err)
+		return
+	}
+	c.Status(204)
+}

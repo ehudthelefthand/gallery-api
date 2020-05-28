@@ -30,6 +30,7 @@ func main() {
 
 	r.POST("/galleries", gh.Create)
 	r.GET("/galleries", gh.List)
+	r.GET("/galleries/:id", gh.GetOne)
 	r.DELETE("/galleries/:id", gh.Delete)
 	r.PATCH("/galleries/:id/names", gh.UpdateName)
 	r.PATCH("/galleries/:id/publishes", gh.UpdatePublishing)

@@ -13,6 +13,7 @@ type Gallery struct {
 type GalleryService interface {
 	Create(gallery *Gallery) error
 	List() ([]Gallery, error)
+	GetByID(id uint) (*Gallery, error)
 	DeleteGallery(id uint) error
 	UpdateGalleryName(id uint, name string) error
 	UpdateGalleryPublishing(id uint, isPublish bool) error
@@ -38,6 +39,14 @@ func (gg *galleryGorm) List() ([]Gallery, error) {
 		return nil, err
 	}
 	return galleries, nil
+}
+
+func (gg *galleryGorm) GetByID(id uint) (*Gallery, error) {
+	gallery := new(Gallery)
+	if err := gg.db.First(gallery, id).Error; err != nil {
+		return nil, err
+	}
+	return gallery, nil
 }
 
 func (gg *galleryGorm) DeleteGallery(id uint) error {

@@ -67,6 +67,25 @@ func (gh *GalleryHandler) List(c *gin.Context) {
 	c.JSON(200, galleries)
 }
 
+func (gh *GalleryHandler) GetOne(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		Error(c, 400, err)
+		return
+	}
+	data, err := gh.gs.GetByID(uint(id))
+	if err != nil {
+		Error(c, 500, err)
+		return
+	}
+	c.JSON(200, GalleryRes{
+		ID:        data.ID,
+		Name:      data.Name,
+		IsPublish: data.IsPublish,
+	})
+}
+
 func (gh *GalleryHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

@@ -32,10 +32,7 @@ func main() {
 	r.GET("/galleries", gh.List)
 	r.DELETE("/galleries/:id", gh.Delete)
 	r.PATCH("/galleries/:id/names", gh.UpdateName)
-	r.PATCH("/galleries/:id/status", gh.UpdateStatus)
+	r.PATCH("/galleries/:id/publishes", gh.UpdatePublishing)
 	r.Run()
-
-	// gs := models.NewGalleryService(db)
-	// gh := handlers.NewGalleryHandler(gs)
 
 }

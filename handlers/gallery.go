@@ -38,8 +38,9 @@ func (gh *GalleryHandler) Create(c *gin.Context) {
 }
 
 type Gallery struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	IsPublish bool   `json:"is_publish"`
 }
 
 func (gh *GalleryHandler) List(c *gin.Context) {
@@ -49,10 +50,11 @@ func (gh *GalleryHandler) List(c *gin.Context) {
 		return
 	}
 	galleries := []Gallery{}
-	for _, a := range data {
+	for _, d := range data {
 		galleries = append(galleries, Gallery{
-			ID:   a.ID,
-			Name: a.Name,
+			ID:        d.ID,
+			Name:      d.Name,
+			IsPublish: d.IsPublish,
 		})
 	}
 	c.JSON(200, galleries)
@@ -101,7 +103,7 @@ type UpdateStatusReq struct {
 	IsPublish bool
 }
 
-func (gh *GalleryHandler) UpdateStatus(c *gin.Context) {
+func (gh *GalleryHandler) UpdatePublishing(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -113,7 +115,7 @@ func (gh *GalleryHandler) UpdateStatus(c *gin.Context) {
 		Error(c, 400, err)
 		return
 	}
-	err = gh.gs.UpdateGalleryStatus(uint(id), req.IsPublish)
+	err = gh.gs.UpdateGalleryPublishing(uint(id), req.IsPublish)
 	if err != nil {
 		Error(c, 500, err)
 		return

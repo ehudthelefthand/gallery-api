@@ -6,7 +6,8 @@ import (
 
 type Gallery struct {
 	gorm.Model
-	Name string
+	Name      string
+	IsPublish bool
 }
 
 type GalleryService interface {
@@ -14,7 +15,7 @@ type GalleryService interface {
 	List() ([]Gallery, error)
 	DeleteGallery(id uint) error
 	UpdateGalleryName(id uint, name string) error
-	UpdateGalleryStatus(id uint, isPublish bool) error
+	UpdateGalleryPublishing(id uint, isPublish bool) error
 }
 
 func NewGalleryService(db *gorm.DB) GalleryService {
@@ -47,6 +48,6 @@ func (gg *galleryGorm) UpdateGalleryName(id uint, name string) error {
 	return gg.db.Model(&Gallery{}).Where("id = ?", id).Update("name", name).Error
 }
 
-func (gg *galleryGorm) UpdateGalleryStatus(id uint, isPublish bool) error {
+func (gg *galleryGorm) UpdateGalleryPublishing(id uint, isPublish bool) error {
 	return gg.db.Model(&Gallery{}).Where("id = ?", id).Update("is_publish", isPublish).Error
 }

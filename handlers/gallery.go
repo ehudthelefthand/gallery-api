@@ -15,14 +15,19 @@ func NewGalleryHandler(gs models.GalleryService) *GalleryHandler {
 	return &GalleryHandler{gs}
 }
 
+type GalleryRes struct {
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	IsPublish bool   `json:"is_publish"`
+	Cover     string `json:"cover,omitempty"`
+}
+
 type CreateReq struct {
 	Name string `json:"name"`
 }
 
 type CreateRes struct {
-	ID        uint   `json:"id"`
-	Name      string `json:"name"`
-	IsPublish bool   `json:"is_publish"`
+	GalleryRes
 }
 
 func (gh *GalleryHandler) Create(c *gin.Context) {
@@ -37,17 +42,11 @@ func (gh *GalleryHandler) Create(c *gin.Context) {
 		Error(c, 500, err)
 		return
 	}
-	c.JSON(201, CreateRes{
-		ID:        gallery.ID,
-		Name:      gallery.Name,
-		IsPublish: gallery.IsPublish,
-	})
-}
-
-type GalleryRes struct {
-	ID        uint   `json:"id"`
-	Name      string `json:"name"`
-	IsPublish bool   `json:"is_publish"`
+	res := new(CreateRes)
+	res.ID = gallery.ID
+	res.Name = gallery.Name
+	res.IsPublish = gallery.IsPublish
+	c.JSON(201, res)
 }
 
 func (gh *GalleryHandler) List(c *gin.Context) {

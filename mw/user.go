@@ -21,7 +21,6 @@ func RequireUser(us models.UserService) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		// set user into context
-		_ = user
+		c.Set("user", user)
 	}
 }

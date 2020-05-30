@@ -20,10 +20,10 @@ func main() {
 
 	db.LogMode(true) // dev only!
 
-	err = models.AutoMigrate(db)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = models.AutoMigrate(db)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	gs := models.NewGalleryService(db)
 	ims := models.NewImageService(db)
@@ -35,26 +35,26 @@ func main() {
 
 	r := gin.Default()
 
-	r.Static("/upload", "./upload")
+	// r.Static("/upload", "./upload")
 
 	r.POST("/signup", uh.Signup)
 	r.POST("/login", uh.Login) // Success => 200, Fail => 401
 
-	// auth := func(c *gin.Context) {
-	// 	header := c.GetHeader("Authorization")
-	// 	token := header[8:]
-	// 	user = GetUserByToken(token)
-	// 	if ไม่มี user {
-	// 		// Bail out
-	// 	}
-
-	// }
-
 	auth := r.Group("/")
 	auth.Use(mw.RequireUser(us))
 	{
+		auth.Static("/upload", "./upload")
 		auth.POST("/logout", uh.Logout)
-		auth.GET("/sessions", uh.GetSession)
+		auth.GET("/sessions", func(c *gin.Context) {
+			user, ok := c.Value("user").(*models.User)
+			if !ok {
+				c.JSON(401, gin.H{
+					"message": "invalid token",
+				})
+				return
+			}
+			c.JSON(200, user)
+		})
 		auth.POST("/galleries", gh.Create)
 		auth.GET("/galleries", gh.List)
 		auth.GET("/galleries/:id", gh.GetOne)
@@ -101,6 +101,6 @@ func main() {
 	// 	})
 	// }
 
-	r.Run()
+	r.Run(":8081")
 
 }

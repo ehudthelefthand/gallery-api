@@ -1,13 +1,19 @@
 package models
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"fmt"
 	"gallery-api/rand"
+	"hash"
 
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
 
 const cost = 12
+const hmacKey = "secret"
 
 type User struct {
 	gorm.Model
@@ -24,14 +30,20 @@ type UserService interface {
 }
 
 func NewUserService(db *gorm.DB) UserService {
-	return &userGorm{db}
+	mac := hmac.New(sha256.New, []byte(hmacKey))
+	return &userGorm{db, mac}
 }
 
 type userGorm struct {
-	db *gorm.DB
+	db   *gorm.DB
+	hmac hash.Hash
 }
 
-func (ug *userGorm) Create(user *User) error {
+func (ug *userGorm) Create(temp *User) error {
+	user := new(User)
+	user.Email = temp.Email
+	user.Password = temp.Password
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), cost)
 	if err != nil {
 		return err
@@ -41,7 +53,17 @@ func (ug *userGorm) Create(user *User) error {
 	if err != nil {
 		return err
 	}
-	user.Token = token
+
+	fmt.Println("token ===> ", token)
+	ug.hmac.Write([]byte(token))
+	tokenHash := ug.hmac.Sum(nil)
+	ug.hmac.Reset()
+	tokenHashStr := base64.URLEncoding.EncodeToString(tokenHash)
+	fmt.Println("tokenHashStr ===> ", tokenHashStr)
+
+	user.Token = tokenHashStr
+	temp.Token = token
+
 	return ug.db.Create(user).Error
 }
 
@@ -59,9 +81,18 @@ func (ug *userGorm) Login(user *User) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	fmt.Println("token ===> ", token)
+
+	ug.hmac.Write([]byte(token))
+	tokenHash := ug.hmac.Sum(nil)
+	ug.hmac.Reset()
+	tokenHashStr := base64.URLEncoding.EncodeToString(tokenHash)
+	fmt.Println("tokenHashStr ===> ", tokenHashStr)
+
 	err = ug.db.Model(&User{}).
 		Where("id = ?", found.ID).
-		Update("token", token).Error
+		Update("token", tokenHashStr).Error
 	if err != nil {
 		return "", err
 	}
@@ -79,8 +110,13 @@ func (ug *userGorm) Logout(token string) error {
 }
 
 func (ug *userGorm) GetByToken(token string) (*User, error) {
+	ug.hmac.Write([]byte(token))
+	tokenHash := ug.hmac.Sum(nil)
+	ug.hmac.Reset()
+	tokenHashStr := base64.URLEncoding.EncodeToString(tokenHash)
+
 	user := new(User)
-	err := ug.db.Where("token = ?", token).First(user).Error
+	err := ug.db.Where("token = ?", tokenHashStr).First(user).Error
 	if err != nil {
 		return nil, err
 	}

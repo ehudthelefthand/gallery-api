@@ -25,5 +25,6 @@ func AutoMigrate(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&Gallery{},
 		&Image{},
+		&User{},
 	).Error
 }

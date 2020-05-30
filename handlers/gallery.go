@@ -31,6 +31,12 @@ type CreateRes struct {
 }
 
 func (gh *GalleryHandler) Create(c *gin.Context) {
+	// header := c.GetHeader("Authorization")
+	// token := header[8:]
+	// user = GetUserByToken(token)
+	// if ไม่มี user {
+	// 	// Bail out
+	// }
 	req := new(CreateReq)
 	if err := c.BindJSON(req); err != nil {
 		Error(c, 400, err)

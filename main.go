@@ -35,7 +35,7 @@ func main() {
 
 	r := gin.Default()
 
-	// r.Static("/upload", "./upload")
+	r.Static("/upload", "./upload")
 
 	r.POST("/signup", uh.Signup)
 	r.POST("/login", uh.Login) // Success => 200, Fail => 401
@@ -43,18 +43,7 @@ func main() {
 	auth := r.Group("/")
 	auth.Use(mw.RequireUser(us))
 	{
-		auth.Static("/upload", "./upload")
 		auth.POST("/logout", uh.Logout)
-		auth.GET("/sessions", func(c *gin.Context) {
-			user, ok := c.Value("user").(*models.User)
-			if !ok {
-				c.JSON(401, gin.H{
-					"message": "invalid token",
-				})
-				return
-			}
-			c.JSON(200, user)
-		})
 		auth.POST("/galleries", gh.Create)
 		auth.GET("/galleries", gh.List)
 		auth.GET("/galleries/:id", gh.GetOne)
@@ -65,41 +54,6 @@ func main() {
 		auth.GET("/galleries/:id/images", imh.ListGalleryImages)
 		auth.DELETE("/images/:id", imh.DeleteImage)
 	}
-
-	// r.Use()
-
-	// xg := r.Group("/groupx")
-	// xg.Use(func(c *gin.Context) {
-	// 	fmt.Println("X")
-	// })
-	// {
-	// 	xg.GET("/testx1", func(c *gin.Context) {
-	// 		fmt.Println("x1-1")
-	// 		// c.Set("abc", "xyz")
-	// 		c.JSON(200, gin.H{
-	// 			"message": "hello X1-1",
-	// 		})
-	// 	}, func(c *gin.Context) {
-	// 		fmt.Println("x1-2")
-	// 		// value := c.Get("abc") // xyz
-	// 		c.JSON(200, gin.H{
-	// 			"message": "hello X1-2",
-	// 		})
-	// 	})
-	// }
-
-	// yg := r.Group("/groupy")
-	// yg.Use(func(c *gin.Context) {
-	// 	fmt.Println("Y")
-	// })
-	// {
-	// 	yg.GET("/testy1", func(c *gin.Context) {
-	// 		fmt.Println("y1")
-	// 		c.JSON(200, gin.H{
-	// 			"message": "hello Y1",
-	// 		})
-	// 	})
-	// }
 
 	r.Run(":8081")
 

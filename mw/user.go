@@ -1,6 +1,7 @@
 package mw
 
 import (
+	"gallery-api/context"
 	"gallery-api/header"
 	"gallery-api/models"
 
@@ -21,6 +22,6 @@ func RequireUser(us models.UserService) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		c.Set("user", user)
+		context.SetUser(c, user)
 	}
 }

@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"errors"
-	"gallery-api/header"
+	"gallery-api/context"
 	"gallery-api/models"
 
 	"github.com/gin-gonic/gin"
@@ -65,12 +65,12 @@ func (uh *UserHandler) Login(c *gin.Context) {
 }
 
 func (uh *UserHandler) Logout(c *gin.Context) {
-	token := header.GetToken(c)
-	if token == "" {
+	user := context.User(c)
+	if user == nil {
 		Error(c, 401, errors.New("invalid token"))
 		return
 	}
-	err := uh.us.Logout(token)
+	err := uh.us.Logout(user)
 	if err != nil {
 		Error(c, 500, err)
 		return

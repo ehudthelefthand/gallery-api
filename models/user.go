@@ -16,14 +16,14 @@ type User struct {
 	gorm.Model
 	Email    string `gorm:"unique_index;not null"`
 	Password string `gorm:"not null"`
-	Token    string `gorm:"unique_index"`
+	Token    string `gorm:"index"`
 }
 
 type UserService interface {
 	Create(user *User) error
 	Login(user *User) (string, error)
 	GetByToken(token string) (*User, error)
-	Logout(token string) error
+	Logout(user *User) error
 }
 
 func NewUserService(db *gorm.DB, hmac *hash.HMAC) UserService {
@@ -88,12 +88,8 @@ func (ug *userGorm) Login(user *User) (string, error) {
 	return token, nil
 }
 
-func (ug *userGorm) Logout(token string) error {
-	user, err := ug.GetByToken(token)
-	if err != nil {
-		return err
-	}
-	return ug.db.Model(&User{}).
+func (ug *userGorm) Logout(user *User) error {
+	return ug.db.Model(user).
 		Where("id = ?", user.ID).
 		Update("token", "").Error
 }

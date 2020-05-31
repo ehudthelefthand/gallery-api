@@ -2,6 +2,7 @@ package main
 
 import (
 	"gallery-api/handlers"
+	"gallery-api/hash"
 	"gallery-api/models"
 	"gallery-api/mw"
 	"log"
@@ -10,6 +11,8 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
+
+const hmacKey = "secret"
 
 func main() {
 	db, err := gorm.Open("mysql", "root:password@tcp(127.0.0.1:3307)/gallerydb?parseTime=true")
@@ -25,9 +28,10 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
+	hmac := hash.NewHMAC(hmacKey)
 	gs := models.NewGalleryService(db)
 	ims := models.NewImageService(db)
-	us := models.NewUserService(db)
+	us := models.NewUserService(db, hmac)
 
 	gh := handlers.NewGalleryHandler(gs)
 	imh := handlers.NewImageHandler(gs, ims)
@@ -38,7 +42,7 @@ func main() {
 	r.Static("/upload", "./upload")
 
 	r.POST("/signup", uh.Signup)
-	r.POST("/login", uh.Login) // Success => 200, Fail => 401
+	r.POST("/login", uh.Login)
 
 	auth := r.Group("/")
 	auth.Use(mw.RequireUser(us))
@@ -55,6 +59,6 @@ func main() {
 		auth.DELETE("/images/:id", imh.DeleteImage)
 	}
 
-	r.Run(":8081")
+	r.Run(":8080")
 
 }

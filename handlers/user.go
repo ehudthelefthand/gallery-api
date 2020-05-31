@@ -36,6 +36,7 @@ func (uh *UserHandler) Signup(c *gin.Context) {
 	}
 	c.JSON(201, gin.H{
 		"token": user.Token,
+		"email": user.Email,
 	})
 }
 
@@ -61,28 +62,6 @@ func (uh *UserHandler) Login(c *gin.Context) {
 	c.JSON(201, gin.H{
 		"token": token,
 	})
-}
-
-func (uh *UserHandler) GetSession(c *gin.Context) {
-	// user, ok := c.Value("user").(*models.User)
-	// if !ok {
-	// 	Error(c, 401, errors.New("invalid token"))
-	// 	return
-	// }
-	// c.JSON(200, user)
-	// token := header.GetToken(c)
-	// if token == "" {
-	// 	Error(c, 401, errors.New("invalid token"))
-	// 	return
-	// }
-	// user, err := uh.us.GetByToken(token)
-	// if err != nil {
-	// 	Error(c, 404, errors.New("user not found"))
-	// 	return
-	// }
-	// c.JSON(201, gin.H{
-	// 	"email": user.Email,
-	// })
 }
 
 func (uh *UserHandler) Logout(c *gin.Context) {

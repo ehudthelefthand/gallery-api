@@ -23,10 +23,10 @@ func main() {
 
 	db.LogMode(true) // dev only!
 
-	// err = models.AutoMigrate(db)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	err = models.AutoMigrate(db)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	hmac := hash.NewHMAC(hmacKey)
 	gs := models.NewGalleryService(db)
@@ -43,20 +43,25 @@ func main() {
 
 	r.POST("/signup", uh.Signup)
 	r.POST("/login", uh.Login)
+	r.GET("/galleries", gh.ListPublish)
 
 	auth := r.Group("/")
 	auth.Use(mw.RequireUser(us))
 	{
 		auth.POST("/logout", uh.Logout)
-		auth.POST("/galleries", gh.Create)
-		auth.GET("/galleries", gh.List)
-		auth.GET("/galleries/:id", gh.GetOne)
-		auth.DELETE("/galleries/:id", gh.Delete)
-		auth.PATCH("/galleries/:id/names", gh.UpdateName)
-		auth.PATCH("/galleries/:id/publishes", gh.UpdatePublishing)
-		auth.POST("/galleries/:id/images", imh.CreateImage)
-		auth.GET("/galleries/:id/images", imh.ListGalleryImages)
-		auth.DELETE("/images/:id", imh.DeleteImage)
+		admin := auth.Group("/admin")
+		{
+			admin.POST("/galleries", gh.Create)
+			admin.GET("/galleries", gh.List)
+			admin.GET("/galleries/:id", gh.GetOne)
+			admin.DELETE("/galleries/:id", gh.Delete)
+			admin.PATCH("/galleries/:id/names", gh.UpdateName)
+			admin.PATCH("/galleries/:id/publishes", gh.UpdatePublishing)
+			admin.POST("/galleries/:id/images", imh.CreateImage)
+			admin.GET("/galleries/:id/images", imh.ListGalleryImages)
+			admin.DELETE("/images/:id", imh.DeleteImage)
+		}
+
 	}
 
 	r.Run(":8080")

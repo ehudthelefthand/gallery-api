@@ -13,11 +13,14 @@ type Gallery struct {
 	gorm.Model
 	Name      string
 	IsPublish bool
+	UserID    uint
+	Images    []Image
 }
 
 type GalleryService interface {
 	Create(gallery *Gallery) error
-	List() ([]Gallery, error)
+	ListAllPublish() ([]Gallery, error)
+	ListByUserID(id uint) ([]Gallery, error)
 	GetByID(id uint) (*Gallery, error)
 	DeleteGallery(id uint) error
 	UpdateGalleryName(id uint, name string) error
@@ -38,9 +41,32 @@ func (gg *galleryGorm) Create(gallery *Gallery) error {
 	return gg.db.Create(gallery).Error
 }
 
-func (gg *galleryGorm) List() ([]Gallery, error) {
+func (gg *galleryGorm) ListAllPublish() ([]Gallery, error) {
 	galleries := []Gallery{}
-	if err := gg.db.Find(&galleries).Error; err != nil {
+	err := gg.db.
+		Where("is_publish = ?", true).
+		Find(&galleries).Error
+	if err != nil {
+		return nil, err
+	}
+	for i := 0; i < len(galleries); i++ {
+		images := []Image{}
+		err := gg.db.
+			Where("gallery_id = ?", galleries[i].ID).
+			Find(&images).Error
+		if err != nil {
+			return nil, err
+		}
+		galleries[i].Images = images
+	}
+	return galleries, nil
+}
+
+func (gg *galleryGorm) ListByUserID(id uint) ([]Gallery, error) {
+	galleries := []Gallery{}
+	if err := gg.db.
+		Where("user_id = ?", id).
+		Find(&galleries).Error; err != nil {
 		return nil, err
 	}
 	return galleries, nil

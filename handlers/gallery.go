@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"gallery-api/context"
 	"gallery-api/models"
 	"strconv"
 
@@ -19,7 +20,6 @@ type GalleryRes struct {
 	ID        uint   `json:"id"`
 	Name      string `json:"name"`
 	IsPublish bool   `json:"is_publish"`
-	Cover     string `json:"cover,omitempty"`
 }
 
 type CreateReq struct {
@@ -31,12 +31,11 @@ type CreateRes struct {
 }
 
 func (gh *GalleryHandler) Create(c *gin.Context) {
-	// header := c.GetHeader("Authorization")
-	// token := header[8:]
-	// user = GetUserByToken(token)
-	// if ไม่มี user {
-	// 	// Bail out
-	// }
+	user := context.User(c)
+	if user == nil {
+		c.Status(401)
+		return
+	}
 	req := new(CreateReq)
 	if err := c.BindJSON(req); err != nil {
 		Error(c, 400, err)
@@ -44,6 +43,7 @@ func (gh *GalleryHandler) Create(c *gin.Context) {
 	}
 	gallery := new(models.Gallery)
 	gallery.Name = req.Name
+	gallery.UserID = user.ID
 	if err := gh.gs.Create(gallery); err != nil {
 		Error(c, 500, err)
 		return
@@ -55,8 +55,35 @@ func (gh *GalleryHandler) Create(c *gin.Context) {
 	c.JSON(201, res)
 }
 
+func (gh *GalleryHandler) ListPublish(c *gin.Context) {
+	user := context.User(c)
+	if user == nil {
+		c.Status(401)
+		return
+	}
+	data, err := gh.gs.ListAllPublish()
+	if err != nil {
+		Error(c, 500, err)
+		return
+	}
+	galleries := []GalleryRes{}
+	for _, d := range data {
+		galleries = append(galleries, GalleryRes{
+			ID:        d.ID,
+			Name:      d.Name,
+			IsPublish: d.IsPublish,
+		})
+	}
+	c.JSON(200, galleries)
+}
+
 func (gh *GalleryHandler) List(c *gin.Context) {
-	data, err := gh.gs.List()
+	user := context.User(c)
+	if user == nil {
+		c.Status(401)
+		return
+	}
+	data, err := gh.gs.ListByUserID(user.ID)
 	if err != nil {
 		Error(c, 500, err)
 		return

@@ -17,9 +17,10 @@ func NewGalleryHandler(gs models.GalleryService) *GalleryHandler {
 }
 
 type GalleryRes struct {
-	ID        uint   `json:"id"`
-	Name      string `json:"name"`
-	IsPublish bool   `json:"is_publish"`
+	ID        uint       `json:"id"`
+	Name      string     `json:"name"`
+	IsPublish bool       `json:"is_publish"`
+	Images    []ImageRes `json:"images"`
 }
 
 type CreateReq struct {
@@ -56,11 +57,6 @@ func (gh *GalleryHandler) Create(c *gin.Context) {
 }
 
 func (gh *GalleryHandler) ListPublish(c *gin.Context) {
-	user := context.User(c)
-	if user == nil {
-		c.Status(401)
-		return
-	}
 	data, err := gh.gs.ListAllPublish()
 	if err != nil {
 		Error(c, 500, err)
@@ -68,10 +64,19 @@ func (gh *GalleryHandler) ListPublish(c *gin.Context) {
 	}
 	galleries := []GalleryRes{}
 	for _, d := range data {
+		images := []ImageRes{}
+		for _, img := range d.Images {
+			images = append(images, ImageRes{
+				ID:        img.ID,
+				GalleryID: img.GalleryID,
+				Filename:  img.FilePath(),
+			})
+		}
 		galleries = append(galleries, GalleryRes{
 			ID:        d.ID,
 			Name:      d.Name,
 			IsPublish: d.IsPublish,
+			Images:    images,
 		})
 	}
 	c.JSON(200, galleries)

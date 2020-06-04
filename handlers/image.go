@@ -107,7 +107,7 @@ func (imh *ImageHandler) ListGalleryImages(c *gin.Context) {
 		r := ListGalleryImagesRes{}
 		r.ID = img.ID
 		r.GalleryID = gallery.ID
-		r.Filename = img.FilePath()
+		r.Filename = img.URLPath()
 		res = append(res, r)
 	}
 	c.JSON(http.StatusOK, res)

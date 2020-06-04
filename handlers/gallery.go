@@ -69,7 +69,7 @@ func (gh *GalleryHandler) ListPublish(c *gin.Context) {
 			images = append(images, ImageRes{
 				ID:        img.ID,
 				GalleryID: img.GalleryID,
-				Filename:  img.FilePath(),
+				Filename:  img.URLPath(),
 			})
 		}
 		galleries = append(galleries, GalleryRes{

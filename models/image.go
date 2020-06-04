@@ -6,6 +6,7 @@ import (
 	"log"
 	"mime/multipart"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 
@@ -24,6 +25,11 @@ type Image struct {
 func (img *Image) FilePath() string {
 	idStr := strconv.FormatUint(uint64(img.GalleryID), 10)
 	return filepath.Join(UploadPath, idStr, img.Filename)
+}
+
+func (img *Image) URLPath() string {
+	idStr := strconv.FormatUint(uint64(img.GalleryID), 10)
+	return path.Join(UploadPath, idStr, img.Filename)
 }
 
 type ImageService interface {

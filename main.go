@@ -40,6 +40,10 @@ func main() {
 
 	r := gin.Default()
 
+	if conf.Mode != "dev" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	r.Static("/upload", "./upload")
 
 	r.POST("/signup", uh.Signup)

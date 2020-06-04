@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gallery-api/config"
 	"gallery-api/handlers"
 	"gallery-api/hash"
 	"gallery-api/models"
@@ -12,10 +13,10 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-const hmacKey = "secret"
-
 func main() {
-	db, err := gorm.Open("mysql", "root:password@tcp(127.0.0.1:3307)/gallerydb?parseTime=true")
+	conf := config.Load()
+
+	db, err := gorm.Open("mysql", conf.Connection)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,7 +29,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	hmac := hash.NewHMAC(hmacKey)
+	hmac := hash.NewHMAC(conf.HMACKey)
 	gs := models.NewGalleryService(db)
 	ims := models.NewImageService(db)
 	us := models.NewUserService(db, hmac)

@@ -42,6 +42,10 @@ func main() {
 	imh := handlers.NewImageHandler(gs, ims)
 	uh := handlers.NewUserHandler(us)
 
+	if conf.Mode != "dev" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
@@ -51,10 +55,6 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-
-	if conf.Mode != "dev" {
-		gin.SetMode(gin.ReleaseMode)
-	}
 
 	r.Static("/upload", "./upload")
 

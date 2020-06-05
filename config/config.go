@@ -1,6 +1,8 @@
 package config
 
-import "os"
+import (
+	"os"
+)
 
 type Config struct {
 	Mode       string
@@ -22,5 +24,6 @@ func Load() *Config {
 	if conf.HMACKey == "" {
 		conf.HMACKey = "secret"
 	}
+
 	return conf
 }

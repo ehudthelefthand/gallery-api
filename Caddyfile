@@ -1,3 +1,4 @@
-pongneng-api.chickenkiller.com
+# pongneng-api.chickenkiller.com
+:80
 
 reverse_proxy api:8080

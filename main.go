@@ -7,7 +7,9 @@ import (
 	"gallery-api/models"
 	"gallery-api/mw"
 	"log"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -22,7 +24,9 @@ func main() {
 	}
 	defer db.Close()
 
-	db.LogMode(true) // dev only!
+	if conf.Mode == "dev" {
+		db.LogMode(true) // dev only!
+	}
 
 	err = models.AutoMigrate(db)
 	if err != nil {
@@ -39,6 +43,14 @@ func main() {
 	uh := handlers.NewUserHandler(us)
 
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"GET", "PUT", "PATCH", "POST", "DELETE", "HEAD"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	if conf.Mode != "dev" {
 		gin.SetMode(gin.ReleaseMode)

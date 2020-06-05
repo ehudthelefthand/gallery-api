@@ -151,7 +151,7 @@ services:
 
 12. ไปแก้ API URL ให้ตรงกับ domain หลังบ้านนะครับ (ถ้ามีหลายที่ก็ โชคดีนะ 555)
 
-13. เสร็จแล้ว git commit และ git push นะครับ
+13. เสร็จแล้ว `git commit` และ `git push` นะครับ
 
 14. login เข้า AWS instance ที่เราอยากให้เป็น หน้าบ้านนะครับ ใช้ ssh นะครับ หรือ PuTTy ถ้าเป็น window
 
@@ -178,4 +178,4 @@ services:
 
 ตัวอย่างที่ทำเสร็จแล้ว deploy อยู่นี่นะ
 
-http://pongneng.chickenkiller.com/
+https://pongneng.chickenkiller.com/

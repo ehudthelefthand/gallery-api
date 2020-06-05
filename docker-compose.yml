@@ -1,0 +1,41 @@
+version: "3.3"
+
+services:
+  db:
+    image: mysql:5.7.30
+    container_name: gallery-db
+    environment: 
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: gallerydb
+      MYSQL_USER: galleryadmin
+      MYSQL_PASSWORD: password
+    command: >
+      mysqld
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+    ports:
+      - "3308:3306"
+    restart: on-failure
+    volumes: 
+      - "./data:/var/lib/mysql"
+  api:
+    build: .
+    container_name: gallery-api
+    environment:
+      MODE: "prod"
+      DB_URL: "galleryadmin:password@tcp(db:3306)/gallerydb?parseTime=true"
+      HMAC_KEY: "secret"
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./upload:/app/upload"
+  proxy:
+    image: caddy:2.0.0-alpine
+    container_name: gallery-proxy
+    restart: always
+    volumes:
+      - "./Caddyfile:/etc/caddy/Caddyfile
+    
+
+    

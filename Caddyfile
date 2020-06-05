@@ -1,4 +1,4 @@
-# pongneng-api.chickenkiller.com
-:80
+pongneng-api.chickenkiller.com # For production
+# :80 # For local
 
 reverse_proxy api:8080

@@ -1,9 +1,12 @@
 # วิธีการ Deploy ระบบ
 
+## คำเตือน: Domain chickenkiller.com เต็มแล้วนะ
+
 1. เตรียมเครื่อง AWS ไว้ 2 instance พร้อมกับ install docker กับ docker-compose ไว้ให้เรียบร้อย
   - ขั้นตอนการ install docker ทำตามนี้นะ https://docs.docker.com/engine/install/ubuntu/
   - ขั้นตอนการ install docker-compose ทำตามนี้นะ https://docs.docker.com/compose/install/
   - สำหรับ window ถ้าใช้ PuTTy อย่าลืมทำเพิ่ม key เข้าไปด้วยนะครับ
+  - อย่าลืมเพิ่ม inbound rule ของ instance ทั้ง 2 ตัวให้มี HTTP กับ HTTPS ด้วย
  
 2. สร้าง subdomain 2 อัน สำหรับ หน้าเว็บ และ API อย่าลืมเชื่อม IP ไปที่ AWS Instance ให้เรียบร้อยนะ
   - เว็บสมัคร subdomain คือ อันนี้นะ http://freedns.afraid.org/

@@ -84,7 +84,7 @@ services:
 
 4. เสร็จแล้วก็ commit แล้วก็ push ได้เลยครับ
 
-5. login เข้าไปที่ AWS instance ที่เราจะ deploy API ใช้ ssh นะครับ หรือ PuTTy ถ้าเป็น window
+5. login เข้าไปที่ AWS instance ที่เราจะ deploy API ใช้ ssh นะครับ หรือ PuTTy ถ้าเป็น window แล้วพิมพ์คำสั่ง `sudo su`
 
 6. `git clone` หรือ ถ้า clone แล้วก็ `git pull` นะ ถ้าใครทำ repo แบบรวมทั้งหน้าบ้านและหลังบ้านก็ไม่เป็นไร เราแค่ cd เข้าไปที่ directory หลังบ้านก็ได้
 
@@ -156,7 +156,7 @@ services:
 
 13. เสร็จแล้ว `git commit` และ `git push` นะครับ
 
-14. login เข้า AWS instance ที่เราอยากให้เป็น หน้าบ้านนะครับ ใช้ ssh นะครับ หรือ PuTTy ถ้าเป็น window
+14. login เข้า AWS instance ที่เราอยากให้เป็น หน้าบ้านนะครับ ใช้ ssh นะครับ หรือ PuTTy ถ้าเป็น window แล้วพิมพ์คำสั่ง `sudo su`
 
 15. `git clone` repo ของหน้าบ้าน ถ้าใครทำแบบรวม repo ก็ไม่เป็นไร cd เข้าไปที่ directory ที่เป็นหน้าบ้านเอาก็ได้ ถ้าเกิดว่า clone ไปแล้วก็ `git pull` แทนนะ
 
